@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#141210">
+<meta name="description" content="Radio Cerrillos · transmisión en vivo desde la antigua torre de control de Cerrillos.">
+<title>Radio Cerrillos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap">
+<style>
+/* Layout: un solo frente de receptor doméstico (gabinete de baquelita), vertical, pensado primero para celular */
+:root{
+  --room:#141210;
+  --cabinet:#26221d;
+  --cabinet-hi:#3a342c;
+  --plate:#b9b2a3;
+  --ink:#1b1915;
+  --ivory:#e9dfc8;
+  --glow:#f2b356;
+  --lamp:#ff4a2e;
+  --muted:#8c8475;
+  --f-display:"Big Shoulders Display", "Arial Narrow", sans-serif;
+  --f-label:"IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%;margin:0}
+body{
+  background:var(--room) radial-gradient(120% 80% at 50% 0%, #1f1b17 0%, var(--room) 60%) no-repeat;
+  color:var(--ivory);
+  font-family:var(--f-label);
+  -webkit-text-size-adjust:100%;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-top:max(24px, env(safe-area-inset-top, 0px));
+  padding-bottom:max(40px, env(safe-area-inset-bottom, 0px));
+}
+.wrap{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+
+/* Gabinete */
+.radio{
+  background:linear-gradient(180deg,var(--cabinet-hi),var(--cabinet) 18%,#1d1a16);
+  border-radius:22px;
+  padding:18px;
+  box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 30px 60px rgba(0,0,0,.55),0 0 0 1px #000;
+  display:flex;flex-direction:column;gap:16px;
+  position:relative;
+}
+.radio::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:.18;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='.6'/></svg>");
+}
+
+/* Placa superior */
+.plate{
+  background:linear-gradient(180deg,#cfc8b8,var(--plate));
+  color:var(--ink);border-radius:6px;padding:10px 14px;
+  display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 -1px 0 rgba(0,0,0,.25) inset;
+}
+.plate h1{font-family:var(--f-display);font-weight:800;font-size:1.65rem;letter-spacing:.06em;margin:0;line-height:1;text-transform:uppercase}
+.plate small{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;text-align:right;line-height:1.3}
+.screw{width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#eee,#777);position:relative;flex:none;align-self:center}
+.screw::after{content:"";position:absolute;left:1px;right:1px;top:4px;height:1px;background:#444;transform:rotate(35deg)}
+
+/* Dial */
+.dial{border-radius:10px;padding:6px;background:#0d0c0a;box-shadow:0 0 0 1px #000,0 2px 0 rgba(255,255,255,.06)}
+.glass{
+  border-radius:6px;position:relative;overflow:hidden;
+  background:linear-gradient(180deg,#d8cdb3,var(--ivory) 40%,#d6caae);
+  transition:filter .9s ease, box-shadow .9s ease;
+  filter:brightness(.42) saturate(.6);
+}
+.is-live .glass{filter:brightness(1) saturate(1);box-shadow:0 0 28px rgba(242,179,86,.35) inset}
+.glass svg{display:block;width:100%;height:auto}
+.glass::before{content:"";position:absolute;inset:0;background:linear-gradient(170deg,rgba(255,255,255,.35),transparent 35%);pointer-events:none}
+
+/* Fila de instrumentos */
+.instruments{display:grid;grid-template-columns:1fr 1.35fr;gap:12px}
+.panel{
+  background:#191612;border-radius:10px;padding:12px 10px 10px;
+  box-shadow:0 0 0 1px #000,0 1px 0 rgba(255,255,255,.05) inset;
+  display:flex;flex-direction:column;align-items:center;gap:8px;min-width:0
+}
+.label{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+.lamp{
+  width:74px;height:74px;border-radius:50%;
+  background:radial-gradient(circle at 40% 35%,#5a1a12,#2a0b07 70%);
+  box-shadow:0 0 0 5px #0b0a08,0 0 0 7px #3b352c,0 3px 8px rgba(0,0,0,.6) inset;
+  display:grid;place-items:center;transition:background .4s, box-shadow .4s;
+}
+.lamp span{font-family:var(--f-display);font-weight:800;font-size:.95rem;letter-spacing:.08em;color:#6e2a1f;text-align:center;line-height:.95;transition:color .4s,text-shadow .4s}
+.is-live .lamp{
+  background:radial-gradient(circle at 40% 35%,#ffb39b,var(--lamp) 45%,#a01d0b 85%);
+  box-shadow:0 0 0 5px #0b0a08,0 0 0 7px #3b352c,0 0 26px 6px rgba(255,74,46,.55);
+  animation:warm 1.2s ease-out 1;
+}
+.is-live .lamp span{color:#fff4ea;text-shadow:0 0 8px rgba(255,255,255,.7)}
+@keyframes warm{0%{opacity:.2}20%{opacity:.8}30%{opacity:.4}55%{opacity:1}65%{opacity:.75}100%{opacity:1}}
+.lamp-state{font-family:var(--f-mono);font-size:.72rem;color:var(--ivory);text-align:center}
+
+.meter{width:100%;border-radius:6px;overflow:hidden;background:linear-gradient(180deg,#d8cdb3,var(--ivory));filter:brightness(.5);transition:filter .9s}
+.is-live .meter{filter:brightness(1)}
+.meter svg{display:block;width:100%;height:auto}
+
+/* Controles */
+.controls{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;padding:4px 4px 0}
+.knob{
+  width:96px;height:96px;border-radius:50%;border:0;cursor:pointer;position:relative;
+  -webkit-tap-highlight-color:transparent;
+  background:repeating-conic-gradient(from 0deg,#2b2620 0 4deg,#1b1814 4deg 8deg);
+  box-shadow:0 0 0 4px #0b0a08,0 8px 16px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.12) inset;
+  transition:transform .3s ease;
+}
+.knob::before{content:"";position:absolute;inset:16px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#4a4237,#1c1915 75%);box-shadow:0 2px 4px rgba(0,0,0,.6)}
+.knob::after{content:"";position:absolute;left:50%;top:20px;width:4px;height:18px;margin-left:-2px;border-radius:2px;background:var(--ivory);opacity:.85}
+.knob[aria-pressed="true"]{transform:rotate(120deg)}
+.knob:focus-visible{outline:2px solid var(--glow);outline-offset:6px}
+.knob-text{display:flex;flex-direction:column;gap:6px;min-width:0}
+.knob-text strong{font-family:var(--f-display);font-weight:800;font-size:1.6rem;letter-spacing:.05em;text-transform:uppercase;line-height:1}
+.knob-text p{margin:0;font-family:var(--f-mono);font-size:.78rem;color:var(--muted);line-height:1.4}
+
+.vol{display:flex;align-items:center;gap:10px;padding:0 4px}
+.vol input{flex:1;accent-color:var(--glow);height:28px}
+.vol output{font-family:var(--f-mono);font-size:.78rem;width:3ch;text-align:right;color:var(--ivory)}
+.vol-note{margin:0;padding:0 4px;font-family:var(--f-mono);font-size:.72rem;color:var(--muted)}
+[hidden]{display:none!important}
+
+/* Tira inferior */
+.log{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  border-top:1px solid #0b0a08;box-shadow:0 1px 0 rgba(255,255,255,.05) inset;padding-top:12px
+}
+.log div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.log b{font-family:var(--f-mono);font-weight:500;font-size:.9rem;font-variant-numeric:tabular-nums;color:var(--ivory)}
+
+@media (max-width:360px){
+  .instruments{grid-template-columns:1fr}
+  .knob{width:80px;height:80px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <section class="radio" id="radio" aria-label="Receptor de radio">
+    <header class="plate">
+      <i class="screw" aria-hidden="true"></i>
+      <h1>Radio Cerrillos</h1>
+      <small>Antigua torre SCTI<br>Cerrillos · Santiago</small>
+      <i class="screw" aria-hidden="true"></i>
+    </header>
+
+    <div class="dial" aria-hidden="true">
+      <div class="glass"><svg id="dialSvg" viewBox="0 0 400 128"></svg></div>
+    </div>
+
+    <div class="instruments">
+      <div class="panel">
+        <div class="lamp" id="lamp"><span>AL<br>AIRE</span></div>
+        <div class="lamp-state" id="lampState" role="status" aria-live="polite">Buscando señal…</div>
+      </div>
+      <div class="panel">
+        <span class="label">Intensidad de señal</span>
+        <div class="meter"><svg id="meterSvg" viewBox="0 0 200 104" aria-hidden="true"></svg></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="knob" id="knob" type="button" aria-pressed="false" aria-label="Escuchar"></button>
+      <div class="knob-text">
+        <strong id="knobLabel">Escuchar</strong>
+        <p id="knobHint">Gira la perilla para sintonizar la transmisión.</p>
+      </div>
+    </div>
+
+    <label class="vol" for="vol" id="volRow">
+      <span class="label">Volumen</span>
+      <input type="range" id="vol" min="0" max="100" value="80">
+      <output id="volOut" for="vol">80</output>
+    </label>
+    <p class="vol-note" id="volNote" hidden>Ajusta el volumen con los botones de tu teléfono.</p>
+
+    <footer class="log">
+      <div><span class="label">Hora local</span><b id="tLocal">--:--</b></div>
+      <div><span class="label">UTC</span><b id="tUtc">--:--</b></div>
+      <div><span class="label">Oyentes</span><b id="listeners">—</b></div>
+    </footer>
+  </section>
+</div>
+
+<audio id="player" preload="none" playsinline></audio>
+
+<script>
+/* ===== Configuración del servidor Icecast ===== */
+const CONFIG = {
+  statusUrl: "https://178-104-156-18.sslip.io/status-json.xsl",
+  streamUrl: "https://178-104-156-18.sslip.io/senal-a",
+  mount: "/senal-a",
+  pollMs: 15000
+};
+
+const $ = id => document.getElementById(id);
+const radio = $("radio"), player = $("player");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+/* live: true = al aire, false = sin señal, null = no se pudo consultar (se permite intentar igual) */
+let live = null, listening = false;
+
+/* En iPhone el volumen solo se cambia con los botones físicos: ocultamos el deslizador */
+(function detectVolume(){
+  try {
+    const a = new Audio(); a.volume = 0.5;
+    if (a.volume !== 0.5){ $("volRow").hidden = true; $("volNote").hidden = false; }
+  } catch {}
+})();
+
+/* ===== Dial: escalas OM y OC con ciudades, como los receptores de los 50 ===== */
+(function drawDial(){
+  const s = $("dialSvg"), ns = "http://www.w3.org/2000/svg";
+  const el = (t, a, txt) => { const e = document.createElementNS(ns, t); for (const k in a) e.setAttribute(k, a[k]); if (txt) e.textContent = txt; s.appendChild(e); return e; };
+  const x0 = 24, x1 = 376;
+  el("text",{x:6,y:22,"font-size":8,"font-family":"IBM Plex Sans Condensed","font-weight":600,fill:"#1b1915"},"OM");
+  for (let f = 530; f <= 1600; f += 10){
+    const x = x0 + (f-530)/(1600-530)*(x1-x0), major = f % 100 === 0;
+    el("line",{x1:x,x2:x,y1:26,y2:major?36:31,stroke:"#1b1915","stroke-width":major?1:.5});
+  }
+  [600,800,1000,1200,1400,1600].forEach(f=>{
+    const x = x0 + (f-530)/(1070)*(x1-x0);
+    el("text",{x,y:20,"text-anchor":"middle","font-size":8,"font-family":"IBM Plex Mono",fill:"#1b1915"},f/10);
+  });
+  const cities = [["LIMA",58],["BS. AIRES",118],["LA HABANA",182],["MADRID",246],["LONDRES",304],["MOSCÚ",356]];
+  cities.forEach(([c,x])=>el("text",{x,y:62,"text-anchor":"middle","font-size":8.5,"letter-spacing":".08em","font-family":"IBM Plex Sans Condensed","font-weight":600,fill:"#5b4a32"},c));
+  el("line",{x1:x0,x2:x1,y1:72,y2:72,stroke:"#1b1915","stroke-width":.6,opacity:.4});
+  el("text",{x:6,y:108,"font-size":8,"font-family":"IBM Plex Sans Condensed","font-weight":600,fill:"#1b1915"},"OC");
+  for (let i = 0; i <= 60; i++){
+    const x = x0 + i/60*(x1-x0), major = i % 10 === 0;
+    el("line",{x1:x,x2:x,y1:major?88:93,y2:98,stroke:"#1b1915","stroke-width":major?1:.5});
+    if (major) el("text",{x,y:112,"text-anchor":"middle","font-size":8,"font-family":"IBM Plex Mono",fill:"#1b1915"},(5.9+i*0.005).toFixed(2));
+  }
+  el("text",{x:376,y:124,"text-anchor":"end","font-size":7,"font-family":"IBM Plex Mono",fill:"#5b4a32"},"49 m · MHz");
+  el("text",{x:214,y:84,"text-anchor":"middle","font-size":9,"font-family":"Big Shoulders Display","font-weight":800,"letter-spacing":".1em",fill:"#a3260f"},"CERRILLOS");
+  el("line",{x1:214,x2:214,y1:4,y2:124,stroke:"#c22a10","stroke-width":2});
+})();
+
+/* ===== S-meter analógico ===== */
+const meterNeedle = (function drawMeter(){
+  const s = $("meterSvg"), ns = "http://www.w3.org/2000/svg";
+  const el = (t, a, txt) => { const e = document.createElementNS(ns, t); for (const k in a) e.setAttribute(k, a[k]); if (txt) e.textContent = txt; s.appendChild(e); return e; };
+  const cx = 100, cy = 100, r = 78, a0 = -55, a1 = 55;
+  const pt = (deg, rad) => [cx + rad*Math.sin(deg*Math.PI/180), cy - rad*Math.cos(deg*Math.PI/180)];
+  const marks = [["1",0],["3",.15],["5",.3],["7",.45],["9",.6],["+20",.8],["+40",1]];
+  for (let i = 0; i <= 20; i++){
+    const t = i/20, d = a0 + t*(a1-a0), [xa,ya] = pt(d,r), [xb,yb] = pt(d, r-(i%2?5:9));
+    el("line",{x1:xa,y1:ya,x2:xb,y2:yb,stroke:t>.6?"#a3260f":"#1b1915","stroke-width":i%2?.6:1.2});
+  }
+  marks.forEach(([l,t])=>{ const [x,y] = pt(a0+t*(a1-a0), r+9); el("text",{x,y:y+3,"text-anchor":"middle","font-size":9,"font-family":"IBM Plex Mono",fill:t>.6?"#a3260f":"#1b1915"},l); });
+  el("text",{x:100,y:70,"text-anchor":"middle","font-size":11,"font-family":"Big Shoulders Display","font-weight":800,"letter-spacing":".12em",fill:"#1b1915"},"S");
+  const n = el("line",{x1:cx,y1:cy,x2:cx,y2:cy-r+4,stroke:"#1b1915","stroke-width":1.6,"stroke-linecap":"round"});
+  el("circle",{cx,cy,r:5,fill:"#1b1915"});
+  return { set(t){ n.setAttribute("transform",`rotate(${a0+t*(a1-a0)} ${cx} ${cy})`); } };
+})();
+
+let mVal = 0, mTarget = .05;
+function meterLoop(){
+  const on = live === true;
+  const base = on ? .66 : .06, jitter = on ? .08 : .04;
+  if (Math.random() < .12) mTarget = Math.max(0, Math.min(1, base + (Math.random()-.5)*2*jitter));
+  mVal += (mTarget - mVal) * .08;
+  meterNeedle.set(mVal);
+  requestAnimationFrame(meterLoop);
+}
+if (reduce) meterNeedle.set(.06); else meterLoop();
+
+/* ===== Estado AL AIRE ===== */
+function setLive(on, info = {}){
+  live = on;
+  radio.classList.toggle("is-live", on === true);
+  $("lampState").textContent = on === true ? "Transmitiendo" : on === false ? "Sin señal" : "Estado desconocido";
+  $("listeners").textContent = on === true ? (info.listeners ?? "—") : "—";
+  if (reduce) meterNeedle.set(on === true ? .66 : .06);
+  if (!listening) $("knobHint").textContent =
+    on === true  ? "Hay transmisión en curso. Gira la perilla para escuchar." :
+    on === false ? "No hay transmisión ahora. Deja la página abierta: la lámpara se enciende al salir al aire." :
+                   "Gira la perilla para intentar sintonizar.";
+}
+
+/* Consulta a Icecast (status-json.xsl): hay transmisión si existe el mount */
+async function checkIcecast(){
+  try {
+    const r = await fetch(CONFIG.statusUrl, { cache: "no-store" });
+    if (!r.ok) throw new Error("status " + r.status);
+    const j = await r.json();
+    let src = j.icestats && j.icestats.source;
+    if (!src) return setLive(false);
+    if (!Array.isArray(src)) src = [src];
+    const m = src.find(s => (s.listenurl || "").endsWith(CONFIG.mount));
+    setLive(!!m, { listeners: m && m.listeners });
+  } catch {
+    /* Si la consulta falla (red, CORS) no bloqueamos: dejamos intentar reproducir */
+    setLive(null);
+  }
+}
+
+/* ===== Escuchar ===== */
+let ctx;
+function staticBurst(ms = 450){
+  try {
+    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+    const len = ctx.sampleRate * ms/1000, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * (1 - i/len);
+    const src = ctx.createBufferSource(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+    f.type = "bandpass"; f.frequency.value = 1800; g.gain.value = .12 * ($("vol").value/100);
+    src.buffer = buf; src.connect(f).connect(g).connect(ctx.destination); src.start();
+  } catch {}
+}
+function startListening(){
+  listening = true;
+  $("knob").setAttribute("aria-pressed","true"); $("knob").setAttribute("aria-label","Detener");
+  $("knobLabel").textContent = "Detener";
+  $("knobHint").textContent = "Sintonizando…";
+  staticBurst();
+  retries = 0;
+  connect();
+  setMediaSession();
+}
+
+/* Conexión con reintentos: si el celular cambia de wifi a datos o la señal cae, vuelve a intentar */
+let retries = 0;
+function connect(){
+  player.src = CONFIG.streamUrl + "?t=" + Date.now();
+  player.volume = $("vol").value/100;
+  player.play().then(()=> { retries = 0; $("knobHint").textContent = "Sintonizado."; })
+    .catch(()=> retry());
+}
+function retry(){
+  if (!listening) return;
+  if (retries >= 5) return stopListening("Se perdió la señal. Revisa tu conexión de datos e intenta otra vez.");
+  retries++;
+  $("knobHint").textContent = "Señal débil, reconectando…";
+  setTimeout(()=> listening && connect(), 1500 * retries);
+}
+
+function setMediaSession(){
+  if (!("mediaSession" in navigator)) return;
+  navigator.mediaSession.metadata = new MediaMetadata({
+    title: "En vivo", artist: "Radio Cerrillos", album: "Desde la antigua torre de control de Cerrillos"
+  });
+  navigator.mediaSession.setActionHandler("play", ()=> !listening && live !== false && startListening());
+  navigator.mediaSession.setActionHandler("pause", ()=> listening && stopListening());
+  try { navigator.mediaSession.setActionHandler("stop", ()=> listening && stopListening()); } catch {}
+}
+function stopListening(msg){
+  listening = false;
+  $("knob").setAttribute("aria-pressed","false"); $("knob").setAttribute("aria-label","Escuchar");
+  $("knobLabel").textContent = "Escuchar";
+  player.pause(); player.removeAttribute("src"); player.load();
+  $("knobHint").textContent = msg || (live === true ? "Hay transmisión en curso. Gira la perilla para escuchar." : "No hay transmisión ahora.");
+}
+$("knob").addEventListener("click", ()=>{
+  if (listening) return stopListening();
+  if (live === false){ staticBurst(300); $("knobHint").textContent = "Solo estática. No hay transmisión ahora; la lámpara se enciende al salir al aire."; return; }
+  startListening();
+});
+player.addEventListener("stalled", ()=> listening && ($("knobHint").textContent = "Señal débil, esperando…"));
+player.addEventListener("error", ()=> listening && player.getAttribute("src") && retry());
+player.addEventListener("ended", ()=> listening && retry());
+player.addEventListener("playing", ()=> { if (listening){ retries = 0; $("knobHint").textContent = "Sintonizado."; } });
+
+$("vol").addEventListener("input", e => { $("volOut").textContent = e.target.value; player.volume = e.target.value/100; });
+
+/* ===== Relojes ===== */
+function tick(){
+  const n = new Date(), p = v => String(v).padStart(2,"0");
+  $("tLocal").textContent = `${p(n.getHours())}:${p(n.getMinutes())}`;
+  $("tUtc").textContent = `${p(n.getUTCHours())}:${p(n.getUTCMinutes())}`;
+}
+tick(); setInterval(tick, 10000);
+
+/* ===== Arranque ===== */
+checkIcecast(); setInterval(checkIcecast, CONFIG.pollMs);
+document.addEventListener("visibilitychange", ()=> !document.hidden && checkIcecast());
+</script>
+</body>
+</html>
